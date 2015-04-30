@@ -1,8 +1,8 @@
 # lite
 
 Collection of some best practices using sqlite3 and python in 
-a web application with wsgi 
-(main target mod_wsgi/apache with multiprocess=True, no threading).
+a web application with WSGI(http://legacy.python.org/dev/peps/pep-3333/) 
+(main target mod_wsgi/apache with multiprocessing but no threading).
 We do a simple app concurrently modifying a single counter which
 is stored in the database and hammer on it concurrently without failure.
 A config file is applied whenever its file modification time changes
