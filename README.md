@@ -26,7 +26,12 @@ sqlite3 is a brilliant database for fast read, but not as good and not
 intended for heavy concurrent write. 
 Although it is ok for the infrastructure to slow down and not scale 
 under heavy load, it should still behave correctly ... and then we 
-enter "sqlite3.OperationalError, database is locked" nightmare, 
+enter "sqlite3.OperationalError, database is locked" nightmare
+(http://beets.radbox.org/blog/sqlite-nightmare.html,
+ http://stackoverflow.com/questions/5529820/sqlite3-operationalerror-database-is-locked,
+ http://stackoverflow.com/questions/3172929/operationalerror-database-is-locked,
+ http://stackoverflow.com/questions/2569233/sqlite3-operationalerror-database-is-locked-non-threaded-application,
+ ...), 
 which we want to avoid with `db.py`.
 We open the database and keep it open, one open connection per module. 
 Every database interaction, at least every request, runs in its own 
