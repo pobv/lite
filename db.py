@@ -1,36 +1,43 @@
 """database access layer for sqlite3
-can be run from several processes within wsgi setup with apache
+can be run from several processes as well as from several
+threads in a process within wsgi setup in apache
 """
 
 import sqlite3
 import contextlib # for closing
+import threading # threadlocal connections
+
 
 # overwrite with something sensible (done by app module)
 DATABASE_FILE = ":memory:"
+
+# each thread in each process uses its own single connection
+_CON = threading.local()
 
 def set_dbpath(pathname):
     """sets up the file to the sqlite database, must be writeable and
     in a writeable directory"""
     global DATABASE_FILE, _CON
     DATABASE_FILE = pathname
-    if _CON:
-        try:
-            _CON.close()
-        except Exception, data:
-            log_error("set_dppath %s" % pathname, data)
-            # but ignore
-    _CON = None # discard anyway
+    # cannot close open db connections, no way to be in all threads
+    # just discard. Hopefully, nobody opens db connections and then
+    # resets the db_path. In that case there might be leaking db
+    # connections in remaining threads
+    _CON = threading.local() # new local store
 
-
-_CON = None # each process uses its own single connection
 def _connect():
-    "sets up a globally available connection and returns it"
-    global _CON
+    "sets up a globally available connection (per thread) and returns it"
     try:
-        _CON = sqlite3.connect(DATABASE_FILE)
-        _CON.row_factory = sqlite3.Row
-        _CON.execute("PRAGMA foreign_keys = ON")
-        return _CON
+        if getattr(_CON, "con", None):
+            try:
+                _CON.con.close()
+            except Exception, data:
+                log_warn("_connect: try to close connection")
+                # ignore
+        _CON.con = sqlite3.connect(DATABASE_FILE)
+        _CON.con.row_factory = sqlite3.Row
+        _CON.con.execute("PRAGMA foreign_keys = ON")
+        return _CON.con
     except sqlite3.Error, err:
         log_error("_connect", err)
         return None
@@ -39,11 +46,11 @@ def get_cursor(fail=True):
     """creates and returns a cursor that can be safely used within a
     with statement. The cursor will be closed at the end of the with.
     If there is no connection yet, create one. """
-    if _CON == None:
+    if getattr(_CON, "con", None) == None:
         _connect()
-    if _CON == None and fail:
+    if getattr(_CON, "con", None) == None and fail:
         raise Exception("No database connection for %s" % DATABASE_FILE)
-    return contextlib.closing(_CON.cursor()) # close cursor after using it
+    return contextlib.closing(_CON.con.cursor()) # close cursor after using it
 
 
 def transact(func):
