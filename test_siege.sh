@@ -1,5 +1,11 @@
 #!/bin/sh
-# rough test with siege, should be done within 1 minute
+# test with siege, should complete within a few minutes
+
+if [ -z "$(which siege)" ]; then
+	echo "please install siege to test"
+	exit 255
+fi
+
 
 URL=http://localhost/lite # where is lite configured...
 CU=20 # number of concurrent users
@@ -22,7 +28,7 @@ echo "  sqlite with wsgi is fast and scales on read"
 ./resetapp.sh
 LOGFILE=siege_read_${NRREAD}_${CU}.log
 echo siege -r ${NRREAD} -c ${CU} -b $URLREAD
-siege -r ${NRREAD} -c ${CU} -b $URLREAD > $LOGFILE 2>&1 
+siege --log=/dev/null -r ${NRREAD} -c ${CU} -b $URLREAD > $LOGFILE 2>&1 
 grep -E "(Elapsed|Concurrency|Longest|rate)" $LOGFILE
 echo "done"
 sleep 2
@@ -32,7 +38,7 @@ echo "  on concurrent update with some sleep time we should do ok"
 ./resetapp.sh
 LOGFILE=siege_${NRUPDATE}_${CU}.log
 echo siege -r ${NRUPDATE} -c ${CU} $URLUPDATE
-siege -r ${NRUPDATE} -c ${CU} $URLUPDATE > $LOGFILE 2>&1 
+siege --log=/dev/null -r ${NRUPDATE} -c ${CU} $URLUPDATE > $LOGFILE 2>&1 
 grep -E "(Elapsed|Concurrency|Longest|rate)" $LOGFILE
 echo "expected $NRUPDATECU got" $(get_counter)
 sleep 2
@@ -46,6 +52,6 @@ echo "  obviously, it is not fast nor scales on update/write"
 ./resetapp.sh
 LOGFILE=siege_${NRUPDATE}_${CU}_battle.log
 echo siege -r ${NRUPDATE} -c ${CU} -b $URLUPDATE > $LOGFILE 2>&1
-siege -r ${NRUPDATE} -c ${CU} -b $URLUPDATE > $LOGFILE 2>&1
+siege --log=/dev/null -r ${NRUPDATE} -c ${CU} -b $URLUPDATE > $LOGFILE 2>&1
 grep -E "(Elapsed|Concurrency|Longest|rate)" $LOGFILE
 echo "expected $NRUPDATECU got" $(get_counter)
