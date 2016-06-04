@@ -80,7 +80,7 @@ In case apache chokes we will see failed transactions in the siege log and obvio
 these increments are then lost.
 On heavy concurrent load it really becomes slow compared to read, on my machine still
 around 80 transactions per second, but that can be much lower on slower non-SSD infrastructure.
-But hey, heavy concurrent write constitutes a severe misuse a sqlite; 
+But hey, heavy concurrent write constitutes a severe misuse of sqlite; 
 but it still works...
 
 
