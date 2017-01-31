@@ -19,7 +19,7 @@ def inc_counter(which=0):
         while not db.transact_one(_INC_UPDATE, [which]):
             pass
         return True
-    except Exception, data:
+    except Exception as data:
         db.log_error("inc_counter %d" % which, data)
         return False
 

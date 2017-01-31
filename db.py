@@ -31,14 +31,14 @@ def _connect():
         if getattr(_CON, "con", None):
             try:
                 _CON.con.close()
-            except Exception, data:
+            except Exception as data:
                 log_warn("_connect: try to close connection")
                 # ignore
         _CON.con = sqlite3.connect(DATABASE_FILE)
         _CON.con.row_factory = sqlite3.Row
         _CON.con.execute("PRAGMA foreign_keys = ON")
         return _CON.con
-    except sqlite3.Error, err:
+    except sqlite3.Error as err:
         log_error("_connect", err)
         return None
 
@@ -63,7 +63,7 @@ def transact(func):
             func(cur)
             cur.connection.commit()
             return True
-        except Exception, data:
+        except Exception as data:
             cur.connection.rollback()
             msg = u"transact func=%s, %s"
             log_error(msg % (func.__name__, func.__doc__), data)
@@ -110,7 +110,7 @@ def upsert(table, key, keyval, attr, attrval):
             cur.execute(insertign, [keyval, attrval])
             cur.connection.commit()
             return True
-        except Exception, data:
+        except Exception as data:
             log_error("upsert %s -> rolling back" % updateign, data)
             cur.connection.rollback()
             return False
@@ -125,7 +125,7 @@ def get(table, key, keyval, attr):
             sql = _SELECT % {'table': table, 'key': key, 'attr': attr}
             cur.execute(sql, [keyval])
             return one_or_none(cur)
-        except sqlite3.OperationalError, data: # unlikely, but hey
+        except sqlite3.OperationalError as data: # unlikely, but hey
             log_error("get %s, %s -> None" % (sql, str(keyval)), data)
             return None
 

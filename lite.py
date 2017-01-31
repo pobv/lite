@@ -191,8 +191,8 @@ def _request_path(environ):
     base_path = wsgiref.util.application_uri(environ)
     complete_path = wsgiref.util.request_uri(environ)
     if not complete_path.startswith(base_path):
-        raise Exception("complete_path %s\ndoes not start with base_path %s",
-                        complete_path, base_path)
+        raise Exception("complete_path %s\ndoes not start with base_path %s" %
+                        (complete_path, base_path))
     ret = complete_path[len(base_path):]
     if not ret.startswith("/"):
         ret = "/"+ret
@@ -204,6 +204,6 @@ def _request_path(environ):
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
     HTTPD = make_server('', 8000, application)
-    print "Serving HTTP on port 8000, press Ctrl-C to exit..."
-    print "... and better run it under apache to test and benchmark"
+    print("Serving HTTP on port 8000, press Ctrl-C to exit...")
+    print("... and better run it under apache to test and benchmark")
     HTTPD.serve_forever()

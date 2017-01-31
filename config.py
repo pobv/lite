@@ -1,6 +1,9 @@
 "read and evaluate initialization files on demand"
 
-from ConfigParser import ConfigParser
+try:
+    from configparser import ConfigParser
+except:
+    from ConfigParser import ConfigParser
 import os.path
 import datetime
 
@@ -42,10 +45,10 @@ def update_config(configpath=None):
         db.log_error("update_config: ctime is None, no update")
         return False
     ctimef = get_modified_configpath_fs(configpath) # of file
-    # print "last modified: %d\n last updated: %d\n" % (ctimef, ctimeu)
+    # print("last modified: %d\n last updated: %d\n" % (ctimef, ctimeu))
     if ctimef > ctimeu: # need to update
         # diff = float(ctimef-ctimeu)/_MILLION
-        # print "need to update, secs diff:", "%1.6f" % diff
+        # print("need to update, secs diff:", "%1.6f" % diff)
         configuration = read_config(configpath)
         # read configfile
         with db.get_cursor() as cur:
@@ -55,7 +58,7 @@ def update_config(configpath=None):
                 #   a little bit like double checked locking...
                 cur.execute(_SELECT_MODIFIED_CONFIG, [configpath])
                 ctimeu2 = _int_from_fetchone(cur.fetchone())
-                # print ctimeu, ctimeu2
+                # print(ctimeu, ctimeu2)
                 if ctimeu != ctimeu2: # unhealthy int equals (a float in there)
                     # no need to rollback, yet
                     msg = "update_config: somebody else updated it %d "
@@ -69,7 +72,7 @@ def update_config(configpath=None):
                 cur.execute(_UPDATE_MODIFIED_CONFIG, [str(ctimef), configpath])
                 cur.connection.commit()
                 return True # we initialized
-            except Exception, data: # may timeout
+            except Exception as data: # may timeout
                 db.log_error("update_config -> no update now", data)
                 return False
     return False # no need to update
@@ -81,7 +84,7 @@ def get_configpath():
         try:
             cur.execute(_SELECT_CONFIGPATH)
             return db.one_or_none(cur)
-        except Exception, data:
+        except Exception as data:
             db.log_error("get_configpath -> None", data)
             return None
 
@@ -98,7 +101,7 @@ def get_modified_configpath_db(configpath):
         try:
             cur.execute(_SELECT_MODIFIED_CONFIG, [configpath])
             return _int_from_fetchone(cur.fetchone())
-        except Exception, data:
+        except Exception as data:
             db.log_error("get_modified_configpath_db -> None", data)
             return None # most likely no refresh of config file now
 

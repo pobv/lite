@@ -12,6 +12,12 @@ chmod a+rwx $DATAPATH
 chmod a+rwx $DATAPATH/$DATAFILE
 # fix other permissions
 chmod a+r *.py
+
+# python 2
 chmod --quiet a+r *.pyc
+# python 3
+chmod --quiet a+rx __pycache__
+chmod --quiet a+r __pycache__/*
+
 chmod a+r *.ini
 chmod a+r *.wsgi
