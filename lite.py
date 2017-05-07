@@ -90,7 +90,7 @@ def index(environ, content):
     Then siege does a load test with 20 users each doing 50 requests
     of concurrently incrementing the same counter (0).
     By adding <tt>-b</tt> to battle [no wait time between requests] it is
-    likely to experience timeout errors (look at the apacher error log).
+    likely to experience timeout errors (look at the apache error log).
     We handle a timeout error in the app by redoing.
     Thus, we force the update until apache gives up.
     If apache hangs on we should always have incremented the counter
