@@ -21,7 +21,7 @@ apache config files live and activate it.
 Run `./resetapp.sh` once.
 Go to `http://localhost/lite` or whereever you put it and play with
 what you can do manually. 
-However, interesting are simple load tests.
+However, interesting are some simple load tests.
 If you have `siege` installed, test it with `./test_siege.sh`.
 It should scale with a couple of thousand read requests per second.
 On the following two concurrent update tests performance drops to a few dozen writes
